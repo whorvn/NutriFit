@@ -20,7 +20,7 @@ Welcome to **NutriFit AI Chatbot**, a personalized fitness assistant built using
 
 1. **Clone the Repository**:
     ```bash
-    git clone https://github.com/your-username/nutrifit-ai-chatbot.git
+    git clone https://github.com/whorvn/NutriFit
     ```
 
 2. **Install Dependencies**:
