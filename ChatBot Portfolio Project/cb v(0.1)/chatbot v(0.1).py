@@ -31,7 +31,8 @@ def calculate_tdee(bmr, activity_level):
 # Main chatbot conversation
 print("Hello! Welcome to NutriFit AI Chatbot. How can I help you today?")
 print("1. I want to find something in the app.")
-print("2. I want to use AI chatbot for fitness.")
+print("2. Personalized Diet and Fitness plan with NutriAI")
+print("3. Quetion&Answer with NutriAI")
 choice = input("Enter your choice: ")
 
 if choice == "1":
@@ -102,5 +103,16 @@ elif choice == "2":
         json.dump(user_data, f)
 
     print("User data and personalized advice stored successfully.")
+    
+elif choice == "3":
+    # Get user question for NutriAI
+    question = input("What is your question for NutriAI? ")
+    
+    # Get a response from Gemini AI
+    response = model.generate_content(question)
+
+    # Display personalized response
+    print(response.text)
+    
 else:
     print("Invalid choice. Please try again.")
