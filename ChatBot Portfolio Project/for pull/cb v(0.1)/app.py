@@ -5,7 +5,7 @@ import json
 app = Flask(__name__)
 
 # Configure Google API
-GOOGLE_API_KEY = 'AIzaSyA5x0J0Pqjuv8l7OtbrJWn3aTEZz-kLgGE'  # Replace with your actual API key
+GOOGLE_API_KEY = 'xxx'  # Replace with your actual API key
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
