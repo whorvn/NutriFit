@@ -1,0 +1,3 @@
+# API key configuration
+GOOGLE_API_KEY = 'AIzaSyA5x0J0Pqjuv8l7OtbrJWn3aTEZz-kLgGE'
+genai.configure(api_key=GOOGLE_API_KEY)
