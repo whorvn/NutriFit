@@ -1,11 +1,15 @@
+import threading
+from time import sleep
+
 from flask import Flask, render_template, request, jsonify
 import google.generativeai as genai
 import json
 
 app = Flask(__name__)
 
+conversation_history = dict()
 # Configure Google API
-GOOGLE_API_KEY = 'xxx'  # Replace with your actual API key
+GOOGLE_API_KEY = 'AIzaSyA5x0J0Pqjuv8l7OtbrJWn3aTEZz-kLgGE'  # Replace with your actual API key
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
@@ -66,14 +70,22 @@ def personalized_plan():
 
 @app.route('/question_answer', methods=['POST'])
 def question_answer():
+    user_id = request.json["user_id"] # FRONT USER ID ATMALIDI BACKDEN ALDIGI
+
     question = request.json['question']
+    if user_id in conversation_history:
+        conversation_history[user_id].append(question)
+    else:
+        conversation_history[user_id] = [question]
+
+    conversation_ctx = "\n".join(conversation_history[user_id])
     prompt = f"""
     You are NutriAI, a fitness chatbot. You are in a conversation with the user.
     The user is asking fitness-related questions about gym, diet, workouts, or health.
     Provide responses only if the question is relevant to fitness.
-
+    
     Conversation history:
-    {question}
+    {conversation_ctx}
 
     Respond appropriately to the user's latest message.
     """
@@ -82,5 +94,12 @@ def question_answer():
 
     return jsonify({"response": response.text})
 
+
+def clean_conversation_history():
+    while True:
+        conversation_history.clear()
+        sleep(86400)
+
 if __name__ == '__main__':
+    threading.Thread(target=clean_conversation_history).start()
     app.run(debug=True)
