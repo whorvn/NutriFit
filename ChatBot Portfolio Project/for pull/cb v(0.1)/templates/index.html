@@ -4,10 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NutriFit AI Chatbot</title>
+    <script>
+        async function sendPersonalizedPlan(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const jsonData = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/personalized_plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const result = await response.json();
+                alert('Response: ' + JSON.stringify(result));
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function sendQuestionAnswer(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const jsonData = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/question_answer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const result = await response.json();
+                alert('Response: ' + JSON.stringify(result));
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Hello! Welcome to NutriFit AI Chatbot. How can I help you today?</h1>
-    <form action="/personalized_plan" method="post">
+
+    <form id="personalized-plan-form" onsubmit="sendPersonalizedPlan(event)">
         <h2>Personalized Diet and Fitness Plan with NutriAI</h2>
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required><br>
@@ -26,8 +68,10 @@
         <button type="submit">Submit</button>
     </form>
 
-    <form action="/question_answer" method="post">
+    <form id="question-answer-form" onsubmit="sendQuestionAnswer(event)">
         <h2>Question & Answer with NutriAI</h2>
+        <label for="user_id">User ID:</label>
+        <input type="text" id="user_id" name="user_id" required><br>
         <label for="question">Your Question:</label>
         <input type="text" id="question" name="question" required><br>
         <button type="submit">Submit</button>
