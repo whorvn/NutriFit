@@ -1,17 +1,17 @@
-from flask import Flask, render_template, request, jsonify
-from flasgger import Swagger
-import google.generativeai as genai
 import threading
 from time import sleep
+from flask import Flask, render_template, request, jsonify
+from flasgger import Swagger
+from pyngrok import ngrok
+import google.generativeai as genai
 import json
-from flask_ngrok import run_with_ngrok
 
 app = Flask(__name__)
-swagger = Swagger(app)  # Initialize Swagger
-run_with_ngrok(app)  # Start ngrok when app is run
+swagger = Swagger(app)
 
 conversation_history = dict()
 
+# Configure Google API
 GOOGLE_API_KEY = 'AIzaSyA5x0J0Pqjuv8l7OtbrJWn3aTEZz-kLgGE'
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
@@ -161,5 +161,9 @@ def clean_conversation_history():
         sleep(86400)
 
 if __name__ == '__main__':
+    # Start a new ngrok tunnel
+    public_url = ngrok.connect(5000)
+    print(f" * Ngrok tunnel available at: {public_url}")
+
     threading.Thread(target=clean_conversation_history).start()
     app.run(host='0.0.0.0', port=5000, debug=True)
