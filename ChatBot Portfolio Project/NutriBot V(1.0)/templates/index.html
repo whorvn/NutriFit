@@ -3,189 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NutriFit AI Chatbot</title>
-    <style>
-        /* General Styles */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        h1, h2 {
-            text-align: center;
-            color: #4CAF50;
-        }
-
-        h1 {
-            margin-top: 20px;
-            font-size: 2.5rem;
-        }
-
-        h2 {
-            margin: 20px 0;
-            font-size: 1.8rem;
-        }
-
-        form {
-            max-width: 500px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        input {
-            width: calc(100% - 20px);
-            padding: 8px 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        /* Accessibility */
-        input:focus, button:focus {
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 128, 0, 0.6);
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 600px) {
-            body {
-                font-size: 14px;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            h2 {
-                font-size: 1.5rem;
-            }
-
-            form {
-                padding: 15px;
-            }
-
-            input, button {
-                font-size: 0.9rem;
-            }
-        }
-    </style>
-    <script>
-        // Function for handling form submission for personalized plan
-        async function sendPersonalizedPlan(event) {
-            event.preventDefault(); // Prevent default form submission behavior
-            console.log('Submitting Personalized Plan Form...');
-            
-            const formData = new FormData(event.target);
-            const jsonData = Object.fromEntries(formData.entries());
-
-            try {
-                const response = await fetch('/personalized_plan', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(jsonData)
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch. Server responded with status: ' + response.status);
-                }
-
-                const result = await response.json();
-                console.log('Response:', result);
-                alert('Personalized Plan Response: ' + JSON.stringify(result));
-            } catch (error) {
-                console.error('Error submitting Personalized Plan:', error);
-                alert('Error: ' + error.message);
-            }
-        }
-
-        // Function for handling form submission for question-answer
-        async function sendQuestionAnswer(event) {
-            event.preventDefault(); // Prevent default form submission behavior
-            console.log('Submitting Question Answer Form...');
-            
-            const formData = new FormData(event.target);
-            const jsonData = Object.fromEntries(formData.entries());
-
-            try {
-                const response = await fetch('/question_answer', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(jsonData)
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch. Server responded with status: ' + response.status);
-                }
-
-                const result = await response.json();
-                console.log('Response:', result);
-                alert('Question Answer Response: ' + JSON.stringify(result));
-            } catch (error) {
-                console.error('Error submitting Question Answer:', error);
-                alert('Error: ' + error.message);
-            }
-        }
-    </script>
+    <title>NutriAI</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Hello! Welcome to NutriFit AI Chatbot. How can I help you today?</h1>
-
-    <form id="personalized-plan-form" onsubmit="sendPersonalizedPlan(event)">
-        <h2>Personalized Diet and Fitness Plan with NutriAI</h2>
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required><br>
-        <label for="age">Age:</label>
-        <input type="number" id="age" name="age" required><br>
-        <label for="weight">Weight (kg):</label>
-        <input type="number" id="weight" name="weight" required><br>
-        <label for="height">Height (cm):</label>
-        <input type="number" id="height" name="height" required><br>
-        <label for="gender">Gender:</label>
-        <input type="text" id="gender" name="gender" required><br>
-        <label for="activity_level">Activity Level:</label>
-        <input type="text" id="activity_level" name="activity_level" required><br>
-        <label for="goal">Fitness Goal:</label>
-        <input type="text" id="goal" name="goal" required><br>
-        <button type="submit">Submit</button>
-    </form>
-
-    <form id="question-answer-form" onsubmit="sendQuestionAnswer(event)">
-        <h2>Question & Answer with NutriAI</h2>
-        <label for="user_id">User ID:</label>
-        <input type="text" id="user_id" name="user_id" required><br>
-        <label for="question">Your Question:</label>
-        <input type="text" id="question" name="question" required><br>
-        <button type="submit">Submit</button>
-    </form>
+    <div class="container">
+        <div class="left" id="left-panel">
+            <div class="content" id="plan-content">
+                <h1>Personalized Plan</h1>
+                <form id="plan-form" class="form">
+                    <input type="text" id="name" placeholder="Name" required>
+                    <input type="number" id="age" placeholder="Age" required>
+                    <input type="number" id="weight" placeholder="Weight (kg)" required>
+                    <input type="number" id="height" placeholder="Height (cm)" required>
+                    <select id="gender" required>
+                        <option value="" disabled selected>Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                    <select id="activity-level" required>
+                        <option value="" disabled selected>Activity Level</option>
+                        <option value="sedentary">Sedentary</option>
+                        <option value="light">Light</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="active">Active</option>
+                        <option value="very active">Very Active</option>
+                    </select>
+                    <input type="text" id="goal" placeholder="Goal" required>
+                    <button type="submit">Get Plan</button>
+                </form>
+            </div>
+            <div class="content" id="chat-content" style="display: none;">
+                <h1>Question & Answer</h1>
+                <form id="chat-form" class="form">
+                    <input type="text" id="user-id" placeholder="User ID" required>
+                    <input type="text" id="question" placeholder="Ask your question..." required>
+                    <button type="submit">Ask</button>
+                    <div id="chat-box"></div>
+                </form>
+            </div>
+        </div>
+        <div class="right">
+            <div class="instructions">
+                <button id="switch-to-chat">Switch to Question & Answer</button>
+                <button id="switch-to-plan">Switch to Personalized Plan</button>
+            </div>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
 </body>
 </html>
