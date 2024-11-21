@@ -12,7 +12,7 @@ swagger = Swagger(app)
 conversation_history = dict()
 
 # Configure Google API
-GOOGLE_API_KEY = 'AIzaSyA5x0J0Pqjuv8l7OtbrJWn3aTEZz-kLgGE'
+GOOGLE_API_KEY = 'apikey'
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
