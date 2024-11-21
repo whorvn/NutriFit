@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriAI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left" id="left-panel">
+            <div class="content" id="plan-content">
+                <h1>Personalized Plan</h1>
+                <form id="plan-form" class="form">
+                    <input type="text" id="name" placeholder="Name" required>
+                    <input type="number" id="age" placeholder="Age" required>
+                    <input type="number" id="weight" placeholder="Weight (kg)" required>
+                    <input type="number" id="height" placeholder="Height (cm)" required>
+                    <select id="gender" required>
+                        <option value="" disabled selected>Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                    <select id="activity-level" required>
+                        <option value="" disabled selected>Activity Level</option>
+                        <option value="sedentary">Sedentary</option>
+                        <option value="light">Light</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="active">Active</option>
+                        <option value="very active">Very Active</option>
+                    </select>
+                    <input type="text" id="goal" placeholder="Goal" required>
+                    <button type="submit">Get Plan</button>
+                </form>
+            </div>
+            <div class="content" id="chat-content" style="display: none;">
+                <h1>Question & Answer</h1>
+                <form id="chat-form" class="form">
+                    <input type="text" id="user-id" placeholder="User ID" required>
+                    <input type="text" id="question" placeholder="Ask your question..." required>
+                    <button type="submit">Ask</button>
+                    <div id="chat-box"></div>
+                </form>
+            </div>
+        </div>
+        <div class="right">
+            <div class="instructions">
+                <button id="switch-to-chat">Switch to Question & Answer</button>
+                <button id="switch-to-plan">Switch to Personalized Plan</button>
+            </div>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>

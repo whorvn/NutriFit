@@ -1,21 +1,21 @@
 import threading
 from time import sleep
+
 from flask import Flask, render_template, request, jsonify
-from flasgger import Swagger
 import google.generativeai as genai
 import json
+
 
 app = Flask(__name__)
 
 
 conversation_history = dict()
-
 # Configure Google API
-# new api is AIzaSyB_8Kay0ZASSYflMblOdcnAp37qcHveRDE
-GOOGLE_API_KEY = 'AIzaSyACNkBzvg7M-Ks3szJMSkp_8ks9aB0ZqPE'
+GOOGLE_API_KEY = 'AIzaSyACNkBzvg7M-Ks3szJMSkp_8ks9aB0ZqPE'  
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
+# Functions to calculate BMR and TDEE
 def calculate_bmr(weight, height, age, gender):
     if gender == 'male':
         bmr = 10 * weight + 6.25 * height - 5 * age + 5
@@ -39,41 +39,6 @@ def index():
 
 @app.route('/personalized_plan', methods=['POST'])
 def personalized_plan():
-    """
-    Generate a personalized fitness plan.
-    ---
-    tags:
-      - Fitness
-    parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            name:
-              type: string
-            age:
-              type: integer
-            weight:
-              type: number
-            height:
-              type: number
-            gender:
-              type: string
-            activity_level:
-              type: string
-            goal:
-              type: string
-    responses:
-      200:
-        description: A JSON object with personalized fitness advice.
-        schema:
-          type: object
-          properties:
-            personalized_advice:
-              type: string
-    """
     data = request.json
     name = data['name']
     age = int(data['age'])
@@ -107,32 +72,8 @@ def personalized_plan():
 
 @app.route('/question_answer', methods=['POST'])
 def question_answer():
-    """
-    Respond to fitness-related questions.
-    ---
-    tags:
-      - Chatbot
-    parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            user_id:
-              type: string
-            question:
-              type: string
-    responses:
-      200:
-        description: A JSON object with the chatbot response.
-        schema:
-          type: object
-          properties:
-            response:
-              type: string
-    """
-    user_id = request.json["user_id"]
+    user_id = request.json["user_id"] # FRONT USER ID ATMALIDI BACKDEN ALDIGI
+
     question = request.json['question']
     if user_id in conversation_history:
         conversation_history[user_id].append(question)
@@ -153,8 +94,8 @@ def question_answer():
 
     response = model.generate_content(prompt)
 
-
     return jsonify({"response": response.text})
+
 
 def clean_conversation_history():
     while True:
@@ -162,10 +103,5 @@ def clean_conversation_history():
         sleep(86400)
 
 if __name__ == '__main__':
-
-    # threading.Thread(target=clean_conversation_history).start()
-    # import logging
-    # logging.basicConfig(level=logging.DEBUG)
-    swagger = Swagger(app)
-    app.run(host="0.0.0.0", port=5000, debug=True)
-
+    threading.Thread(target=clean_conversation_history).start()
+    app.run(host='0.0.0.0', port=1000, debug=True)

@@ -11,7 +11,6 @@ app = Flask(__name__)
 conversation_history = dict()
 
 # Configure Google API
-# new api is AIzaSyB_8Kay0ZASSYflMblOdcnAp37qcHveRDE
 GOOGLE_API_KEY = 'AIzaSyACNkBzvg7M-Ks3szJMSkp_8ks9aB0ZqPE'
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
@@ -152,7 +151,6 @@ def question_answer():
     """
 
     response = model.generate_content(prompt)
-
 
     return jsonify({"response": response.text})
 

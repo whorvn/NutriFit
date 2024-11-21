@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Assistant</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f0f4f3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #container {
+      width: 900px;
+      height: 600px;
+      background: #ffffff;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #3aa7b1;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    #main {
+      display: flex;
+      flex-grow: 1;
+    }
+
+    #menu {
+      width: 30%;
+      background: #ededed;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      border-right: 1px solid #ccc;
+    }
+
+    #menu button {
+      background: #3aa7b1;
+      color: #fff;
+      border: none;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s ease-in-out;
+    }
+
+    #menu button:hover {
+      background: #339e9b;
+    }
+
+    #content {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    #personalized-plan-content,
+    #chat-content {
+      display: none;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      outline: none;
+      transition: 0.3s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #3aa7b1;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    #chat-messages {
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      padding: 10px;
+    }
+
+    .message {
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .message.user {
+      background: #3aa7b1;
+      color: #fff;
+      text-align: right;
+    }
+
+    .message.bot {
+      background: #f4f4f4;
+      color: #333;
+    }
+
+    .submit-btn {
+      background: #3aa7b1;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      background: #339e9b;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <header>Fitness Assistant</header>
+    <div id="main">
+      <!-- Sidebar Menu -->
+      <div id="menu">
+        <button onclick="showSection('personalized-plan')">Personalized Plan</button>
+        <button onclick="showSection('chat')">Question-Answer</button>
+      </div>
+
+      <!-- Content Section -->
+      <div id="content">
+        <!-- Personalized Plan Content -->
+        <div id="personalized-plan-content">
+          <h2>Generate Your Personalized Plan</h2>
+          <form id="plan-form">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+              <label for="age">Age</label>
+              <input type="number" id="age" name="age" placeholder="Enter your age" required>
+            </div>
+            <div class="form-group">
+              <label for="weight">Weight (kg)</label>
+              <input type="number" id="weight" name="weight" placeholder="Enter your weight" required>
+            </div>
+            <div class="form-group">
+              <label for="height">Height (cm)</label>
+              <input type="number" id="height" name="height" placeholder="Enter your height" required>
+            </div>
+            <div class="form-group">
+              <label for="gender">Gender</label>
+              <select id="gender" name="gender" required>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="activity_level">Activity Level</label>
+              <select id="activity_level" name="activity_level" required>
+                <option value="sedentary">Sedentary</option>
+                <option value="light">Light</option>
+                <option value="moderate">Moderate</option>
+                <option value="active">Active</option>
+                <option value="very active">Very Active</option>
+              </select>
+            </div>
+            <button type="submit" class="submit-btn">Submit</button>
+          </form>
+        </div>
+
+        <!-- Chat Content -->
+        <div id="chat-content">
+          <h2>Chat with NutriAI</h2>
+          <div id="chat-messages"></div>
+          <input type="text" id="chat-input" placeholder="Ask a question..." onkeypress="handleChatInput(event)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const content = document.getElementById('content');
+    const personalizedPlanContent = document.getElementById('personalized-plan-content');
+    const chatContent = document.getElementById('chat-content');
+
+    function showSection(section) {
+      content.style.display = 'block';
+      if (section === 'personalized-plan') {
+        personalizedPlanContent.style.display = 'block';
+        chatContent.style.display = 'none';
+      } else if (section === 'chat') {
+        chatContent.style.display = 'block';
+        personalizedPlanContent.style.display = 'none';
+      }
+    }
+
+    function handleChatInput(event) {
+      if (event.key === 'Enter') {
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const message = chatInput.value.trim();
+
+        if (message) {
+          chatMessages.innerHTML += `<div class="message user">${message}</div>`;
+          chatInput.value = '';
+          setTimeout(() => {
+            chatMessages.innerHTML += `<div class="message bot">Let me think...</div>`;
+          }, 1000);
+        }
+      }
+    }
+    
+  </script>
+</body>
+</html>
