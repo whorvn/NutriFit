@@ -1,25 +1,21 @@
-<<<<<<< HEAD
-=======
 import threading
 from time import sleep
-
->>>>>>> cc81d30824026447fda313d0c3fdf0305f634400
 from flask import Flask, render_template, request, jsonify
+from flasgger import Swagger
+from pyngrok import ngrok
 import google.generativeai as genai
 import json
 
 app = Flask(__name__)
+swagger = Swagger(app)
 
-<<<<<<< HEAD
-=======
 conversation_history = dict()
->>>>>>> cc81d30824026447fda313d0c3fdf0305f634400
+
 # Configure Google API
-GOOGLE_API_KEY = 'AIzaSyA5x0J0Pqjuv8l7OtbrJWn3aTEZz-kLgGE'  # Replace with your actual API key
+GOOGLE_API_KEY = 'AIzaSyA5x0J0Pqjuv8l7OtbrJWn3aTEZz-kLgGE'
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-# Functions to calculate BMR and TDEE
 def calculate_bmr(weight, height, age, gender):
     if gender == 'male':
         bmr = 10 * weight + 6.25 * height - 5 * age + 5
@@ -43,6 +39,41 @@ def index():
 
 @app.route('/personalized_plan', methods=['POST'])
 def personalized_plan():
+    """
+    Generate a personalized fitness plan.
+    ---
+    tags:
+      - Fitness
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            age:
+              type: integer
+            weight:
+              type: number
+            height:
+              type: number
+            gender:
+              type: string
+            activity_level:
+              type: string
+            goal:
+              type: string
+    responses:
+      200:
+        description: A JSON object with personalized fitness advice.
+        schema:
+          type: object
+          properties:
+            personalized_advice:
+              type: string
+    """
     data = request.json
     name = data['name']
     age = int(data['age'])
@@ -76,11 +107,32 @@ def personalized_plan():
 
 @app.route('/question_answer', methods=['POST'])
 def question_answer():
-<<<<<<< HEAD
-    question = request.json['question']
-=======
-    user_id = request.json["user_id"] # FRONT USER ID ATMALIDI BACKDEN ALDIGI
-
+    """
+    Respond to fitness-related questions.
+    ---
+    tags:
+      - Chatbot
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            user_id:
+              type: string
+            question:
+              type: string
+    responses:
+      200:
+        description: A JSON object with the chatbot response.
+        schema:
+          type: object
+          properties:
+            response:
+              type: string
+    """
+    user_id = request.json["user_id"]
     question = request.json['question']
     if user_id in conversation_history:
         conversation_history[user_id].append(question)
@@ -88,20 +140,13 @@ def question_answer():
         conversation_history[user_id] = [question]
 
     conversation_ctx = "\n".join(conversation_history[user_id])
->>>>>>> cc81d30824026447fda313d0c3fdf0305f634400
     prompt = f"""
     You are NutriAI, a fitness chatbot. You are in a conversation with the user.
     The user is asking fitness-related questions about gym, diet, workouts, or health.
     Provide responses only if the question is relevant to fitness.
-<<<<<<< HEAD
-
-    Conversation history:
-    {question}
-=======
     
     Conversation history:
     {conversation_ctx}
->>>>>>> cc81d30824026447fda313d0c3fdf0305f634400
 
     Respond appropriately to the user's latest message.
     """
@@ -110,17 +155,15 @@ def question_answer():
 
     return jsonify({"response": response.text})
 
-<<<<<<< HEAD
-if __name__ == '__main__':
-    app.run(debug=True)
-=======
-
 def clean_conversation_history():
     while True:
         conversation_history.clear()
         sleep(86400)
 
 if __name__ == '__main__':
+    # Start a new ngrok tunnel
+    public_url = ngrok.connect(5000)
+    print(f" * Ngrok tunnel available at: {public_url}")
+
     threading.Thread(target=clean_conversation_history).start()
-    app.run(debug=True)
->>>>>>> cc81d30824026447fda313d0c3fdf0305f634400
+    app.run(host='0.0.0.0', port=5000, debug=True)

@@ -4,8 +4,11 @@ import google.generativeai as genai
 from google.colab import userdata
 import json
 
-GOOGLE_API_KEY=userdata.get('API_KEY')
+# API key configuration
+GOOGLE_API_KEY = userdata.get('API_KEY')
 genai.configure(api_key=GOOGLE_API_KEY)
+
+# Gemini model configuration
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 # Functions to calculate BMR and TDEE
@@ -28,31 +31,44 @@ def calculate_tdee(bmr, activity_level):
     }
     return bmr * activity_multipliers.get(activity_level, 1.2)
 
+# # Function to filter questions based on fitness topics
+# def is_fitness_related(question):
+#     fitness_keywords = ["fitness", "diet", "gym", "exercise", "nutrition", "workout", "calories", "muscle", "fat loss"]
+#     return any(keyword in question.lower() for keyword in fitness_keywords)
+
 # Main chatbot conversation
 print("Hello! Welcome to NutriFit AI Chatbot. How can I help you today?")
 print("1. I want to find something in the app.")
 print("2. Personalized Diet and Fitness plan with NutriAI")
-print("3. Quetion&Answer with NutriAI")
+print("3. Question & Answer with NutriAI")
+print("4. Chat with manager")
 choice = input("Enter your choice: ")
 
 if choice == "1":
-    # Navigate to app sections based on user's choice
     print("What do you want to find in the app?")
-    print("1. Find a recipe.")
-    print("2. Find a workout.")
-    print("3. Find a diet plan.")
-    print("4. Find a supplement.")
-    choice = input("Enter your choice: ")
-    if choice == "1":
-        print("Click here to view recipes: app://nutrifit/recipes")
-    elif choice == "2":
-        print("Click here to view workouts: app://nutrifit/workouts")
-    elif choice == "3":
-        print("Click here to view diet plans: app://nutrifit/dietplans")
-    elif choice == "4":
-        print("Click here to view supplements: app://nutrifit/supplements")
+    
+    # User inputs their request in natural language
+    user_input = input("Enter what you are looking for: ")
+
+    # Use Gemini AI to analyze the user's input
+    if is_fitness_related(user_input):
+        response = model.generate_content(user_input)
+        intent = response.candidates[0]
+
+        # Map AI-generated intent to app sections
+        if "recipe" in intent or "cook" in intent or "meal" in intent:
+            print("Click here to view recipes: app://nutrifit/recipes")
+        elif "workout" in intent or "exercise" in intent:
+            print("Click here to view workouts: app://nutrifit/workouts")
+        elif "diet" in intent or "plan" in intent:
+            print("Click here to view diet plans: app://nutrifit/dietplans")
+        elif "supplement" in intent or "vitamin" in intent:
+            print("Click here to view supplements: app://nutrifit/supplements")
+        else:
+            print("Sorry, I couldn't find what you're looking for. Please try again.")
     else:
-        print("Invalid choice.")
+        print("Please ask a question related to fitness, gym, or diet.")
+      
 elif choice == "2":
     # Get user data for personalized fitness recommendations
     name = input("What is your name? ")
@@ -82,9 +98,6 @@ elif choice == "2":
     # Display personalized response
     print(response.text)
 
-    # Display personalized response
-    # print(response.text)
-
     # Store user data in JSON file
     user_data = {
         "name": name,
@@ -105,14 +118,50 @@ elif choice == "2":
     print("User data and personalized advice stored successfully.")
     
 elif choice == "3":
-    # Get user question for NutriAI
-    question = input("What is your question for NutriAI? ")
+    print("You are now chatting with NutriAI. Type 'exit' to end the chat.")
     
-    # Get a response from Gemini AI
-    response = model.generate_content(question)
+    # Initialize an empty list to store conversation history
+    conversation_history = []
 
-    # Display personalized response
-    print(response.text)
+    while True:
+        # Get user question for NutriAI
+        question = input("What is your question for NutriAI? ")
+
+        # Exit the loop if the user types 'exit'
+        if question.lower() == 'exit':
+            print("Thank you for chatting with NutriAI. Goodbye!")
+            break
+
+        # Add user input to conversation history
+        conversation_history.append(f"User: {question}")
+
+        # Build prompt with conversation history for Gemini
+        # Keep previous exchanges in the prompt for context
+        conversation_context = "\n".join(conversation_history)
+        prompt = f"""
+        You are NutriAI, a fitness chatbot. You are in a conversation with the user. 
+        The user is asking fitness-related questions about gym, diet, workouts, or health.
+        Provide responses only if the question is relevant to fitness.
+        
+        Conversation history:
+        {conversation_context}
+
+        Respond appropriately to the user's latest message.
+        """
+
+        # Get a response from Gemini AI
+        response = model.generate_content(prompt)
+
+        # Display the response
+        answer = response.text
+        print(answer)
+
+        # Add AI's response to conversation history
+        conversation_history.append(f"NutriAI: {answer}")
+elif choice == "4":
+    # Contact via Github
+    hyperlink_format = '<a href="https://github.com/whorvn/NutriFit">Contact us via WhatsApp</a>'
+    print(hyperlink_format)
     
 else:
     print("Invalid choice. Please try again.")

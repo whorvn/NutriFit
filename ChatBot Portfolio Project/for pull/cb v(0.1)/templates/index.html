@@ -4,10 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NutriFit AI Chatbot</title>
+<<<<<<< HEAD
 </head>
 <body>
     <h1>Hello! Welcome to NutriFit AI Chatbot. How can I help you today?</h1>
     <form action="/personalized_plan" method="post">
+=======
+    <script>
+        // Function for handling form submission for personalized plan
+        async function sendPersonalizedPlan(event) {
+            event.preventDefault(); // Prevent default form submission behavior
+            console.log('Submitting Personalized Plan Form...');
+            
+            const formData = new FormData(event.target);
+            const jsonData = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/personalized_plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jsonData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch. Server responded with status: ' + response.status);
+                }
+
+                const result = await response.json();
+                console.log('Response:', result);
+                alert('Personalized Plan Response: ' + JSON.stringify(result));
+            } catch (error) {
+                console.error('Error submitting Personalized Plan:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Function for handling form submission for question-answer
+        async function sendQuestionAnswer(event) {
+            event.preventDefault(); // Prevent default form submission behavior
+            console.log('Submitting Question Answer Form...');
+            
+            const formData = new FormData(event.target);
+            const jsonData = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/question_answer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jsonData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch. Server responded with status: ' + response.status);
+                }
+
+                const result = await response.json();
+                console.log('Response:', result);
+                alert('Question Answer Response: ' + JSON.stringify(result));
+            } catch (error) {
+                console.error('Error submitting Question Answer:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Hello! Welcome to NutriFit AI Chatbot. How can I help you today?</h1>
+
+    <form id="personalized-plan-form" onsubmit="sendPersonalizedPlan(event)">
+>>>>>>> cc81d30824026447fda313d0c3fdf0305f634400
         <h2>Personalized Diet and Fitness Plan with NutriAI</h2>
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required><br>
@@ -26,11 +91,22 @@
         <button type="submit">Submit</button>
     </form>
 
+<<<<<<< HEAD
     <form action="/question_answer" method="post">
         <h2>Question & Answer with NutriAI</h2>
+=======
+    <form id="question-answer-form" onsubmit="sendQuestionAnswer(event)">
+        <h2>Question & Answer with NutriAI</h2>
+        <label for="user_id">User ID:</label>
+        <input type="text" id="user_id" name="user_id" required><br>
+>>>>>>> cc81d30824026447fda313d0c3fdf0305f634400
         <label for="question">Your Question:</label>
         <input type="text" id="question" name="question" required><br>
         <button type="submit">Submit</button>
     </form>
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> cc81d30824026447fda313d0c3fdf0305f634400
