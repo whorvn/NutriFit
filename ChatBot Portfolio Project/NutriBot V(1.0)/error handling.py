@@ -1,4 +1,5 @@
 import threading
+from cachetools import TTLCache
 from time import sleep
 from flask import Flask, render_template, request, jsonify
 from flasgger import Swagger
@@ -11,7 +12,7 @@ conversation_history = dict()
 
 # Configure Google API
 
-GOOGLE_API_KEY = 'AIzaSyB_8Kay0ZASSYflMblOdcnAp37qcHveRDE'
+GOOGLE_API_KEY = 'AIzaSyACNkBzvg7M-Ks3szJMSkp_8ks9aB0ZqPE'
 try:
     genai.configure(api_key=GOOGLE_API_KEY)
     model = genai.GenerativeModel('gemini-1.5-flash')
@@ -125,6 +126,17 @@ def personalized_plan():
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
 
+from cachetools import TTLCache
+
+# Conversation history with a 15-second expiry per user
+conversation_history = TTLCache(maxsize=1000, ttl=86400)
+
+def add_to_conversation(user_id, question):
+    if user_id in conversation_history:
+        conversation_history[user_id].append(question)
+    else:
+        conversation_history[user_id] = [question]
+
 @app.route('/question_answer', methods=['POST'])
 def question_answer():
     """
@@ -155,11 +167,13 @@ def question_answer():
     try:
         user_id = request.json["user_id"]
         question = request.json['question']
-        if user_id in conversation_history:
-            conversation_history[user_id].append(question)
-        else:
-            conversation_history[user_id] = [question]
+        # if user_id in conversation_history:
+        #     conversation_history[user_id].append(question)
+        # else:
+        #     conversation_history[user_id] = [question]
 
+        add_to_conversation(user_id, question)
+        
         conversation_ctx = "\n".join(conversation_history[user_id])
         prompt = f"""
         You are NutriAI, a fitness chatbot. You are in a conversation with the user.
@@ -180,20 +194,28 @@ def question_answer():
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
 
-def clean_conversation_history():
-    while True:
-        try:
-            conversation_history.clear()
-            sleep(86400)
-        except Exception as e:
-            print(f"Error in cleaning conversation history: {e}")
+# stop_event = threading.Event()
+
+# def clean_conversation_history():
+#     while not stop_event.is_set():  # Check if the stop signal is set
+#         try:
+#             conversation_history.clear()
+#             sleep(15)  # Sleep for a day
+#         except Exception as e:
+#             print(f"Error in cleaning conversation history: {e}")
+
+# @app.teardown_appcontext
+# def shutdown_threads(exception=None):
+#     stop_event.set()  # Signal the thread to stop
 
 if __name__ == '__main__':
     try:
-        # threading.Thread(target=clean_conversation_history).start()
-        # import logging
-        # logging.basicConfig(level=logging.DEBUG)
+        # cleaning_thread = threading.Thread(target=clean_conversation_history)
+        # cleaning_thread.start()
+        
         swagger = Swagger(app)
         app.run(host="0.0.0.0", port=5000, debug=True)
+        
     except Exception as e:
         print(f"Error starting the application: {e}")
+

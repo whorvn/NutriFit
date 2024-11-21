@@ -4,7 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NutriAI</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            height: 600px;
+            position: relative;
+        }
+        .left, .right {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .left {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+        }
+        .right {
+            background: linear-gradient(135deg, #2193b0, #6dd5ed);
+            color: white;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .content {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+        .instructions button {
+            background: transparent;
+            border: 2px solid white;
+            border-radius: 5px;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        .instructions button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .form {
+            display: flex;
+            flex-direction: column;
+        }
+        form input, form select, form button {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        form button {
+            background: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        form button:hover {
+            background: #0056b3;
+        }
+        #chat-box {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>        
 </head>
 <body>
     <div class="container">
@@ -12,16 +100,16 @@
             <div class="content" id="plan-content">
                 <h1>Personalized Plan</h1>
                 <form id="plan-form" class="form">
-                    <input type="text" id="name" placeholder="Name" required>
-                    <input type="number" id="age" placeholder="Age" required>
-                    <input type="number" id="weight" placeholder="Weight (kg)" required>
-                    <input type="number" id="height" placeholder="Height (cm)" required>
-                    <select id="gender" required>
+                    <input type="text" id="name" name="name" placeholder="Name" required>
+                    <input type="number" id="age" name="age" placeholder="Age" required>
+                    <input type="number" id="weight" name="weight" placeholder="Weight (kg)" required>
+                    <input type="number" id="height" name="height" placeholder="Height (cm)" required>
+                    <select id="gender" name="gender" required>
                         <option value="" disabled selected>Gender</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
                     </select>
-                    <select id="activity-level" required>
+                    <select id="activity-level" name="activity_level" required>
                         <option value="" disabled selected>Activity Level</option>
                         <option value="sedentary">Sedentary</option>
                         <option value="light">Light</option>
@@ -29,15 +117,15 @@
                         <option value="active">Active</option>
                         <option value="very active">Very Active</option>
                     </select>
-                    <input type="text" id="goal" placeholder="Goal" required>
+                    <input type="text" id="goal" name="goal" placeholder="Goal" required>
                     <button type="submit">Get Plan</button>
                 </form>
             </div>
             <div class="content" id="chat-content" style="display: none;">
                 <h1>Question & Answer</h1>
                 <form id="chat-form" class="form">
-                    <input type="text" id="user-id" placeholder="User ID" required>
-                    <input type="text" id="question" placeholder="Ask your question..." required>
+                    <input type="text" id="user-id" name="user_id" placeholder="User ID" required>
+                    <input type="text" id="question" name="question" placeholder="Ask your question..." required>
                     <button type="submit">Ask</button>
                     <div id="chat-box"></div>
                 </form>
@@ -50,6 +138,58 @@
             </div>
         </div>
     </div>
-    <script src="scripts.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const planContent = document.getElementById("plan-content");
+        const chatContent = document.getElementById("chat-content");
+        const switchToChat = document.getElementById("switch-to-chat");
+        const switchToPlan = document.getElementById("switch-to-plan");
+
+        switchToChat.addEventListener("click", () => {
+            planContent.style.display = "none";
+            chatContent.style.display = "flex";
+        });
+
+        switchToPlan.addEventListener("click", () => {
+            chatContent.style.display = "none";
+            planContent.style.display = "flex";
+        });
+
+        async function sendRequest(event, endpoint) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const jsonData = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jsonData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Server Error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (endpoint === '/personalized_plan') {
+                    alert('Personalized Plan Response: ' + JSON.stringify(result));
+                } else if (endpoint === '/question_answer') {
+                    const chatBox = document.getElementById("chat-box");
+                    const chatResponse = document.createElement("p");
+                    chatResponse.textContent = `NutriAI: ${result.response}`;
+                    chatBox.appendChild(chatResponse);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            }
+        }
+
+        document.getElementById("plan-form").addEventListener("submit", (event) => sendRequest(event, '/personalized_plan'));
+        document.getElementById("chat-form").addEventListener("submit", (event) => sendRequest(event, '/question_answer'));
+    });
+    </script>
 </body>
 </html>
