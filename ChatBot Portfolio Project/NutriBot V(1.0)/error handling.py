@@ -90,11 +90,11 @@ def personalized_plan():
     """
     try:
         data = request.json
-        name = data['name']
-        age = int(data['age'])
-        weight = float(data['weight'])
-        height = float(data['height'])
-        gender = data['gender'].lower()
+        name = request.json['name']
+        age = request.json['age']
+        weight = request.json['weight']
+        height = request.json['height']
+        gender = request.json['gender']
         activity_level = data['activity_level'].lower()
         goal = data['goal'].lower()
 
