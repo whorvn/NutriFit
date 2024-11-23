@@ -68,7 +68,7 @@ def personalized_plan():
             name:
               type: string
             age:
-              type: integer
+              type: number
             weight:
               type: number
             height:
@@ -95,8 +95,9 @@ def personalized_plan():
         weight = request.json['weight']
         height = request.json['height']
         gender = request.json['gender']
+        goal = request.json['goal'].lower()
         activity_level = data['activity_level'].lower()
-        goal = data['goal'].lower()
+        
 
         bmr = calculate_bmr(weight, height, age, gender)
         tdee = calculate_tdee(bmr, activity_level)
